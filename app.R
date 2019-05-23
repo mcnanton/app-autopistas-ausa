@@ -115,8 +115,8 @@ sidebar <- dashboardSidebar(
                                                                             max = 23,
                                                                             value = 30)),
     
-    menuItem("CÃ³digo de esta App", icon = icon("bullhorn",lib='glyphicon'), 
-             href = "https://www.github.com")
+    menuItem("C0digo de esta App", icon = icon("bullhorn",lib='glyphicon'), 
+             href = "https://github.com/bynans/app-autopistas-ausa")
     
     
   )
