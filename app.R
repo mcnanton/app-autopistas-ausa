@@ -3,7 +3,7 @@ library(dplyr)
 library(lubridate)
 library(stringr)
 #cargo datos de trÃ¡nsito vehicular 2018
-transito_2018<-read.csv("flujo-vehicular-2018.csv", encoding = 'UTF-8')
+transito_2018<-read.csv("flujo-vehicular-2018.csv",fileEncoding = 'UTF-8')
 #Aprolijo las fechas, las paso a date con lubridate
 transito_2018$fecha<-ymd(transito_2018$fecha)
 
@@ -18,7 +18,7 @@ transito_por_hora_autopista <- transito_2018 %>% group_by(estacion, hora_inicio)
 transito_2018<-transito_2018%>%select(-forma_pago, -observacion, -periodo, -mes, -hora_fin, -dia_fecha)%>% rename(hora=hora_inicio, autopista=estacion)%>% group_by(fecha, autopista) %>% summarise(trafico=sum(cantidad_pasos)) 
 
 #Levanto dataset de intervenciones de seguridad vial
-intervenciones_2018<-read.csv("intervenciones-de-seguridad-vial.csv",encoding = 'UTF-8')
+intervenciones_2018<-read.csv("intervenciones-de-seguridad-vial.csv",fileEncoding = 'UTF-8')
 #dropeo variable que no voy a utilizar y filtro por aÃ±o 2018
 intervenciones_2018<-intervenciones_2018%>%select(-pk)%>%filter(as.integer(intervenciones_2018$periodo) >= 201801 & intervenciones_2018$periodo <= 201812) %>% select(-periodo)
 #La variable fecha tiene valores mal procesados, esto viene del CSV base. Para esto creo dos variables y las combino para tener una variable fecha unificada.
@@ -48,7 +48,7 @@ autopistas_hs_peligrosidad$porcentaje <- autopistas_hs_peligrosidad$accidentes*1
 #Obtengo dataset Autopistas x dia x Peligrosidad
 autopistas_dia_peligrosidad <-intervenciones_2018 %>% group_by(autopista, dia) %>% summarise(accidentes=sum(n())) %>% arrange(autopista, desc(accidentes)) %>% mutate(indice_peligrosidad=rep_len(1:7, length.out = 7))
 
-autopistas_dia_peligrosidad$dia <- ordered(autopistas_dia_peligrosidad$dia, levels=c("Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "SÃ¡bado"))
+autopistas_dia_peligrosidad$dia <- ordered(autopistas_dia_peligrosidad$dia, levels=c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"))
 ##
 #Elimino niveles no utilizados del factor autopista de autopistas_dia y autopistas_hs
 autopistas_dia_peligrosidad$autopista <- droplevels(autopistas_dia_peligrosidad$autopista)
