@@ -1,16 +1,3 @@
-packages  <-  c("dplyr", "ggplot2","lubridate","shiny","shinydashboard",
-             "stringr")
-
-
-#use this function to check if each package is on the local machine
-#if a package is installed, it will be loaded
-#if any are not, the missing package(s) will be installed and loaded
-package.check <- lapply(packages, FUN = function(x) {
-  if (!require(x, character.only = TRUE)) {
-    install.packages(x, dependencies = TRUE)
-    library(x, character.only = TRUE)
-  }
-})
 
 library(dplyr)
 library(lubridate)
