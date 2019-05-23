@@ -50,7 +50,7 @@ intervenciones_2018<- filter(intervenciones_2018, autopista %in% autopistas_fina
 #Obtengo dataset Autopistas x HS x Peligrosidad
 autopistas_hs_peligrosidad <- intervenciones_2018 %>% group_by(autopista, hora) %>%tally()
 autopistas_hs_peligrosidad<- autopistas_hs_peligrosidad %>% rename(accidentes=n) %>% arrange(autopista, desc(accidentes))
-#Asigno Ã­ndice de peligrosidad
+#Asigno Indice de peligrosidad
 autopistas_hs_peligrosidad <- transform(autopistas_hs_peligrosidad, indice_peligrosidad = ave(as.character(autopista),as.character(autopista), FUN = seq_along))
 
 #Calculo porcentaje que representa cada hs del total de accidentes
@@ -61,7 +61,7 @@ autopistas_hs_peligrosidad$porcentaje <- autopistas_hs_peligrosidad$accidentes*1
 #Obtengo dataset Autopistas x dia x Peligrosidad
 autopistas_dia_peligrosidad <-intervenciones_2018 %>% group_by(autopista, dia) %>% summarise(accidentes=sum(n())) %>% arrange(autopista, desc(accidentes)) %>% mutate(indice_peligrosidad=rep_len(1:7, length.out = 7))
 
-autopistas_dia_peligrosidad$dia <- ordered(autopistas_dia_peligrosidad$dia, levels=c("Domingo", "Lunes", "Martes", "MiÃ©rcoles", "Jueves", "Viernes", "SÃ¡bado"))
+autopistas_dia_peligrosidad$dia <- ordered(autopistas_dia_peligrosidad$dia, levels=c("Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "SÃ¡bado"))
 ##
 #Elimino niveles no utilizados del factor autopista de autopistas_dia y autopistas_hs
 autopistas_dia_peligrosidad$autopista <- droplevels(autopistas_dia_peligrosidad$autopista)
@@ -104,7 +104,7 @@ sidebar <- dashboardSidebar(
                                                                                  label = "Autopista:",
                                                                                  choices = accidentes_autopista_2018$autopista)),
     
-    menuItem("DÃ­a",icon=icon("picture", lib='glyphicon'),selectInput(inputId = "seleccion_dia",
+    menuItem("Dia",icon=icon("picture", lib='glyphicon'),selectInput(inputId = "seleccion_dia",
                                                                      label = "Dia de la semana:",
                                                                      choices = autopistas_dia_peligrosidad$dia,
                                                                      selected = TRUE)),
@@ -132,7 +132,7 @@ frow1 <- fluidRow(
 frow2 <- fluidRow(
   
   box(
-    title = "Incidentes por dÃ­a"
+    title = "Incidentes por dia"
     ,status = "primary"
     ,solidHeader = TRUE 
     ,collapsible = TRUE 
