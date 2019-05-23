@@ -1,7 +1,21 @@
+packages  <-  c("dplyr", "ggplot2","lubridate","shiny","shinydashboard",
+             "stringr")
+
+
+#use this function to check if each package is on the local machine
+#if a package is installed, it will be loaded
+#if any are not, the missing package(s) will be installed and loaded
+package.check <- lapply(packages, FUN = function(x) {
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x, dependencies = TRUE)
+    library(x, character.only = TRUE)
+  }
+})
+
 library(dplyr)
 library(lubridate)
 library(stringr)
-#cargo datos de tránsito vehicular 2018
+#cargo datos de trÃ¡nsito vehicular 2018
 transito_2018<-read.csv("flujo-vehicular-2018.csv", encoding = 'UTF-8')
 #Aprolijo las fechas, las paso a date con lubridate
 transito_2018$fecha<-ymd(transito_2018$fecha)
@@ -9,7 +23,7 @@ transito_2018$fecha<-ymd(transito_2018$fecha)
 #Adjudico el nombre de la autopista a las estaciones de peaje
 transito_2018$estacion <- plyr::revalue(transito_2018$estacion, c("ALBERDI"="AU 25 DE MAYO", "AVELLANEDA"="AU PERITO MORENO","DELLEPIANE LINIERS"="AU DELLEPIANE", "DELLEPIANE LINIERSLEPIANE CENTRO"="AU DELLEPIANE", "ILLIA"="AU ILLIA", "SARMIENTO"="AU ILLIA", "RETIRO"="AU ILLIA", "SALGUERO"="AU ILLIA"))
 
-#Calculo tránsito por día y por hora en cada autopista
+#Calculo trÃ¡nsito por dÃ­a y por hora en cada autopista
 transito_por_dia_autopista <- transito_2018 %>% group_by(estacion, dia) %>% summarise(trafico=sum(cantidad_pasos))
 transito_por_hora_autopista <- transito_2018 %>% group_by(estacion, hora_inicio) %>% summarise(trafico=sum(cantidad_pasos))
 
@@ -18,7 +32,7 @@ transito_2018<-transito_2018%>%select(-forma_pago, -observacion, -periodo, -mes,
 
 #Levanto dataset de intervenciones de seguridad vial
 intervenciones_2018<-read.csv("intervenciones-de-seguridad-vial.csv",encoding = 'UTF-8')
-#dropeo variable que no voy a utilizar y filtro por año 2018
+#dropeo variable que no voy a utilizar y filtro por aÃ±o 2018
 intervenciones_2018<-intervenciones_2018%>%select(-pk)%>%filter(as.integer(intervenciones_2018$periodo) >= 201801 & intervenciones_2018$periodo <= 201812) %>% select(-periodo)
 #La variable fecha tiene valores mal procesados, esto viene del CSV base. Para esto creo dos variables y las combino para tener una variable fecha unificada.
 intervenciones_2018$fecha<-as.character(intervenciones_2018$fecha)
@@ -28,7 +42,7 @@ ydm[is.na(ydm)] <- ymd[is.na(ydm)]
 intervenciones_2018$fecha <- ydm
 #Corrijo discrepancias en la manera de nombrar las autopistas/semiautopistas
 intervenciones_2018$autopista<-plyr::revalue(intervenciones_2018$autopista, c("AU PERTIO MORENO" = "AU PERITO MORENO", "AV LUGONES" = "AV. LUGONES"))
-#Agrego día de semana (L-V) a intervenciones
+#Agrego dÃ­a de semana (L-V) a intervenciones
 intervenciones_2018$dia<-as.factor(str_to_title(weekdays(intervenciones_2018$fecha)))
 autopistas_finales <- c("AU 25 DE MAYO", "AU FRONDIZI", "AU ILLIA", "AU DELLEPIANE", "AU PERITO MORENO", "AU CAMPORA")
 intervenciones_2018<- filter(intervenciones_2018, autopista %in% autopistas_finales)
@@ -36,7 +50,7 @@ intervenciones_2018<- filter(intervenciones_2018, autopista %in% autopistas_fina
 #Obtengo dataset Autopistas x HS x Peligrosidad
 autopistas_hs_peligrosidad <- intervenciones_2018 %>% group_by(autopista, hora) %>%tally()
 autopistas_hs_peligrosidad<- autopistas_hs_peligrosidad %>% rename(accidentes=n) %>% arrange(autopista, desc(accidentes))
-#Asigno índice de peligrosidad
+#Asigno Ã­ndice de peligrosidad
 autopistas_hs_peligrosidad <- transform(autopistas_hs_peligrosidad, indice_peligrosidad = ave(as.character(autopista),as.character(autopista), FUN = seq_along))
 
 #Calculo porcentaje que representa cada hs del total de accidentes
@@ -47,27 +61,27 @@ autopistas_hs_peligrosidad$porcentaje <- autopistas_hs_peligrosidad$accidentes*1
 #Obtengo dataset Autopistas x dia x Peligrosidad
 autopistas_dia_peligrosidad <-intervenciones_2018 %>% group_by(autopista, dia) %>% summarise(accidentes=sum(n())) %>% arrange(autopista, desc(accidentes)) %>% mutate(indice_peligrosidad=rep_len(1:7, length.out = 7))
 
-autopistas_dia_peligrosidad$dia <- ordered(autopistas_dia_peligrosidad$dia, levels=c("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"))
+autopistas_dia_peligrosidad$dia <- ordered(autopistas_dia_peligrosidad$dia, levels=c("Domingo", "Lunes", "Martes", "MiÃ©rcoles", "Jueves", "Viernes", "SÃ¡bado"))
 ##
 #Elimino niveles no utilizados del factor autopista de autopistas_dia y autopistas_hs
 autopistas_dia_peligrosidad$autopista <- droplevels(autopistas_dia_peligrosidad$autopista)
 autopistas_hs_peligrosidad$autopista <- droplevels(autopistas_hs_peligrosidad$autopista)
 
-#Porcentaje de accidentes del año por autopista
-accidentes_autopista_2018 <- intervenciones_2018 %>% filter(autopista %in% autopistas_finales) %>% group_by(autopista) %>% summarise(total_accidentes=sum(n())) %>% mutate(total_2018=sum(total_accidentes)) %>%  mutate(porcentaje_accidentes_año=total_accidentes*100/total_2018)
+#Porcentaje de accidentes del ano por autopista
+accidentes_autopista_2018 <- intervenciones_2018 %>% filter(autopista %in% autopistas_finales) %>% group_by(autopista) %>% summarise(total_accidentes=sum(n())) %>% mutate(total_2018=sum(total_accidentes)) %>%  mutate(porcentaje_accidentes_ano=total_accidentes*100/total_2018)
 accidentes_autopista_2018$autopista <- as.factor(accidentes_autopista_2018$autopista)
 
-#Tráfico anual por autopista
+#TrÃ¡fico anual por autopista
 transito_2018_autopista  <-  transito_2018 %>% group_by(autopista) %>% summarise(trafico_anual=sum(trafico))
-#Uno tráfico anual por autopista a la tabla de accidentes por autopista
+#Uno trÃ¡fico anual por autopista a la tabla de accidentes por autopista
 accidentes_autopista_2018 <- accidentes_autopista_2018 %>% left_join(transito_2018_autopista, by="autopista")
 accidentes_autopista_2018$autopista <- as.factor(accidentes_autopista_2018$autopista)
 
-#Porcentaje de accidentes respecto al tráfico anual de la autopista
+#Porcentaje de accidentes respecto al trÃ¡fico anual de la autopista
 accidentes_autopista_2018 <- accidentes_autopista_2018 %>% mutate(porcentaje_accidentes_trafico=total_accidentes*100/trafico_anual)
 accidentes_autopista_2018 <- accidentes_autopista_2018 %>% arrange(desc(porcentaje_accidentes_trafico))
 
-#Asigno orden de pelogrosidad a las autopistas que cuentan con datos de tráfico
+#Asigno orden de pelogrosidad a las autopistas que cuentan con datos de trÃ¡fico
 accidentes_autopista_2018$indice_peligrosidad <- seq_len(6)
 accidentes_autopista_2018$indice_peligrosidad[is.na(accidentes_autopista_2018$porcentaje_accidentes_trafico)]<-NA
  
@@ -90,8 +104,8 @@ sidebar <- dashboardSidebar(
                                                                                  label = "Autopista:",
                                                                                  choices = accidentes_autopista_2018$autopista)),
     
-    menuItem("Día",icon=icon("picture", lib='glyphicon'),selectInput(inputId = "seleccion_dia",
-                                                                     label = "Día de la semana:",
+    menuItem("DÃ­a",icon=icon("picture", lib='glyphicon'),selectInput(inputId = "seleccion_dia",
+                                                                     label = "DÃ­a de la semana:",
                                                                      choices = autopistas_dia_peligrosidad$dia,
                                                                      selected = TRUE)),
     
@@ -101,7 +115,7 @@ sidebar <- dashboardSidebar(
                                                                             max = 23,
                                                                             value = 30)),
     
-    menuItem("Código de esta App", icon = icon("bullhorn",lib='glyphicon'), 
+    menuItem("CÃ³digo de esta App", icon = icon("bullhorn",lib='glyphicon'), 
              href = "https://www.github.com")
     
     
@@ -118,7 +132,7 @@ frow1 <- fluidRow(
 frow2 <- fluidRow(
   
   box(
-    title = "Incidentes por día"
+    title = "Incidentes por dÃ­a"
     ,status = "primary"
     ,solidHeader = TRUE 
     ,collapsible = TRUE 
@@ -150,7 +164,7 @@ server <- function(input, output) {
   #Variables para cajitas
   accidentes_seleccion_2018 <- reactive({accidentes_autopista_2018 %>% filter(autopista==input$seleccion_autopista) %>% select(total_accidentes)})
   peligrosidad_seleccion_autopista <- reactive({accidentes_autopista_2018 %>% filter(autopista==input$seleccion_autopista) %>% select(indice_peligrosidad)})
-  porcentaje_accidentes_2018 <- reactive({accidentes_autopista_2018 %>% filter(autopista==input$seleccion_autopista) %>% select(porcentaje_accidentes_año)})
+  porcentaje_accidentes_2018 <- reactive({accidentes_autopista_2018 %>% filter(autopista==input$seleccion_autopista) %>% select(porcentaje_accidentes_ano)})
   porcentaje_acc_hora <- reactive({autopistas_hs_peligrosidad %>% filter(autopista==input$seleccion_autopista) %>% filter (hora==input$seleccion_hora) %>% select(porcentaje)})
   
   #corregir
@@ -198,14 +212,14 @@ server <- function(input, output) {
       ,color = "yellow")
   })
   
-  #Gráficos
+  #GrÃ¡ficos
   
   output$accidentesDia <- renderPlot({ autopistas_dia_peligrosidad %>% filter(autopista==input$seleccion_autopista) %>% 
       ggplot(aes(x=dia, y=accidentes)) + 
       geom_bar(position = "dodge", stat = "identity") + ylab("Accidentes") + 
       xlab("dia") + theme(legend.position="bottom" 
                           ,plot.title = element_text(size=15, face="bold")) + 
-      ggtitle("Incidentes por día")
+      ggtitle("Incidentes por dÃ­a")
   })
   
   
