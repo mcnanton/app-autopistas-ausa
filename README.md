@@ -5,4 +5,5 @@ El objetivo de esta aplicación es mostrar información de tráfico e incidentes
 
 Los datos fueron obtenidos del portal de datos del Gobierno de la Ciudad de Buenos Aires:
 https://data.buenosaires.gob.ar/dataset/flujo-vehicular-por-unidades-de-peaje-ausa
+
 https://data.buenosaires.gob.ar/dataset/seguridad-vial-autopistas-ausa
