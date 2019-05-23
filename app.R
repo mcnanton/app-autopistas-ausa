@@ -23,7 +23,7 @@ transito_2018$fecha<-ymd(transito_2018$fecha)
 #Adjudico el nombre de la autopista a las estaciones de peaje
 transito_2018$estacion <- plyr::revalue(transito_2018$estacion, c("ALBERDI"="AU 25 DE MAYO", "AVELLANEDA"="AU PERITO MORENO","DELLEPIANE LINIERS"="AU DELLEPIANE", "DELLEPIANE LINIERSLEPIANE CENTRO"="AU DELLEPIANE", "ILLIA"="AU ILLIA", "SARMIENTO"="AU ILLIA", "RETIRO"="AU ILLIA", "SALGUERO"="AU ILLIA"))
 
-#Calculo trÃ¡nsito por dÃ­a y por hora en cada autopista
+#Calculo trÃ¡nsito por dia y por hora en cada autopista
 transito_por_dia_autopista <- transito_2018 %>% group_by(estacion, dia) %>% summarise(trafico=sum(cantidad_pasos))
 transito_por_hora_autopista <- transito_2018 %>% group_by(estacion, hora_inicio) %>% summarise(trafico=sum(cantidad_pasos))
 
@@ -42,7 +42,7 @@ ydm[is.na(ydm)] <- ymd[is.na(ydm)]
 intervenciones_2018$fecha <- ydm
 #Corrijo discrepancias en la manera de nombrar las autopistas/semiautopistas
 intervenciones_2018$autopista<-plyr::revalue(intervenciones_2018$autopista, c("AU PERTIO MORENO" = "AU PERITO MORENO", "AV LUGONES" = "AV. LUGONES"))
-#Agrego dÃ­a de semana (L-V) a intervenciones
+#Agrego dia de semana (L-V) a intervenciones
 intervenciones_2018$dia<-as.factor(str_to_title(weekdays(intervenciones_2018$fecha)))
 autopistas_finales <- c("AU 25 DE MAYO", "AU FRONDIZI", "AU ILLIA", "AU DELLEPIANE", "AU PERITO MORENO", "AU CAMPORA")
 intervenciones_2018<- filter(intervenciones_2018, autopista %in% autopistas_finales)
@@ -105,7 +105,7 @@ sidebar <- dashboardSidebar(
                                                                                  choices = accidentes_autopista_2018$autopista)),
     
     menuItem("DÃ­a",icon=icon("picture", lib='glyphicon'),selectInput(inputId = "seleccion_dia",
-                                                                     label = "DÃ­a de la semana:",
+                                                                     label = "Dia de la semana:",
                                                                      choices = autopistas_dia_peligrosidad$dia,
                                                                      selected = TRUE)),
     
@@ -166,13 +166,8 @@ server <- function(input, output) {
   peligrosidad_seleccion_autopista <- reactive({accidentes_autopista_2018 %>% filter(autopista==input$seleccion_autopista) %>% select(indice_peligrosidad)})
   porcentaje_accidentes_2018 <- reactive({accidentes_autopista_2018 %>% filter(autopista==input$seleccion_autopista) %>% select(porcentaje_accidentes_ano)})
   porcentaje_acc_hora <- reactive({autopistas_hs_peligrosidad %>% filter(autopista==input$seleccion_autopista) %>% filter (hora==input$seleccion_hora) %>% select(porcentaje)})
-  
-  #corregir
   accidentes_seleccion_dia <- reactive({autopistas_dia_peligrosidad %>% filter(autopista==input$seleccion_autopista) %>% filter (dia==input$seleccion_dia) %>% select(accidentes)})
-  
-  #corregir
-  peligrosidad_seleccion_dia <- reactive({autopistas_dia_peligrosidad %>% filter(autopista==input$seleccion_autopista) %>% filter(dia==input$seleccion_dia) %>% select(indice_peligrosidad)})
-  
+    peligrosidad_seleccion_dia <- reactive({autopistas_dia_peligrosidad %>% filter(autopista==input$seleccion_autopista) %>% filter(dia==input$seleccion_dia) %>% select(indice_peligrosidad)})
   
   
   #Cajitas
@@ -219,7 +214,7 @@ server <- function(input, output) {
       geom_bar(position = "dodge", stat = "identity") + ylab("Accidentes") + 
       xlab("dia") + theme(legend.position="bottom" 
                           ,plot.title = element_text(size=15, face="bold")) + 
-      ggtitle("Incidentes por dÃ­a")
+      ggtitle("Incidentes por dia")
   })
   
   
